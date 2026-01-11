@@ -12,5 +12,5 @@ sed -i "1s|^#!.*|#!${VENV2_DIR}/bin/python|" "${INSTALL_DIR}/netcp.py"
 chmod +x "${INSTALL_DIR}/netcp.py"
 
 sudo systemctl restart "${SERVICE_NAME}"
-
+sudo systemctl restart "${SERVICE_DST}"
 log "Update complete"

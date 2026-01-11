@@ -4,8 +4,12 @@ source scripts/common.sh
 require_root
 
 log "Stopping service"
-systemctl stop "${SERVICE_NAME}"
+systemctl stop "${SERVICE_DST}"
 systemctl disable "${SERVICE_NAME}"
+rm -f "${SERVICE_DST}"
+
+systemctl stop "${SERVICE_DST}"
+systemctl disable "${SERVICE_DST}"
 rm -f "${SERVICE_DST}"
 
 log "Removing files"

@@ -1,0 +1,13 @@
+[Unit]
+Description=Serve a copyable command page over HTTP
+After=network.target
+
+[Service]
+Type=simple
+User=__USER__                # Will be replaced by installer
+WorkingDirectory=__HOME__/Programs/netcp
+ExecStart=__HOME__/Programs/netcp/serve_command.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
