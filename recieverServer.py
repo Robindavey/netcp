@@ -12,10 +12,21 @@ HOST = "0.0.0.0"
 DESKTOP = os.path.expanduser("~/Desktop/Programs")
 DEFAULT_BUCKET = os.path.join(DESKTOP, "netcp_bucket")
 os.makedirs(DEFAULT_BUCKET, exist_ok=True)  # ensure bucket exists
-
+allowedIP = open("IPAllowed.txt", "r").read().splitlines()
 # Banned directories for safety
 BANNED_DIRS = {".git", "__pycache__", "venv"}
+def getLocalIP():
+    import socket
 
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))  # doesn't actually send data
+        local_ip = s.getsockname()[0]
+    finally:
+        s.close()
+
+    return local_ip
+CONFIGPORT = PORT +1
 # ==========================
 # HTTP Request Handler
 # ==========================
@@ -25,7 +36,14 @@ class FileReceiverHandler(BaseHTTPRequestHandler):
         try:
             # Parse query parameters
             parsed_url = urlparse(self.path)
-            params = parse_qs(parsed_url.query)
+            ip = parsed_url.hostname
+            if ip not in allowedIP:
+                # Send error response if something goes wrong
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(f"Message from a not allowed IP {ip}\nTry using {getLocalIP()}:{CONFIGPORT} to add".encode())
+                print("Error handling request:", e)
+                params = parse_qs(parsed_url.query)
             relative_path = os.path.normpath(params.get("file", ["uploaded_file"])[0].strip())
             abs_flag = params.get("abs", ["0"])[0]
             is_absolute = str(abs_flag).lower() in ("1", "true", "yes")
