@@ -9,7 +9,7 @@ def writeIP(ip):
     try:
         with open("allowedIP", "a") as file:
             file.write(ip + "\n")
-        print(f"{ip} added to allowed Ip's")
+        print(f"{ip} added to allowed Ip's Updated")
         return
     except FileNotFoundError as e:
         print(e)
