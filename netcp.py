@@ -67,7 +67,16 @@ def send_file(local_path, dest, ip="127.0.0.1", port=PORT, absolute=False):
         headers={"Content-Length": str(len(reader))}
     )
 
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        # Print server-provided error message to help the user diagnose failures
+        try:
+            body = response.text
+        except Exception:
+            body = "(no response body)"
+        print(f"Server returned {response.status_code} {response.reason}:\n{body}")
+        raise
 
 import sys
     
