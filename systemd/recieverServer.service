@@ -1,0 +1,23 @@
+[Unit]
+Description=NetCP Receiver Server
+After=network.target
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__HOME__/netcp
+ExecStart=__HOME__/netcp/venv2/bin/python __HOME__/netcp/recieverServer.py
+Restart=always
+RestartSec=3
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=netcp-receiver
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

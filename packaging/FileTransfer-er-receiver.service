@@ -1,0 +1,15 @@
+[Unit]
+Description=NetCP Receiver (FileTransfer-er)
+After=network.target
+
+[Service]
+Type=simple
+# Point ExecStart to your python interpreter and the full path to receiverServer.py
+ExecStart=/usr/bin/python3 /home/robin/Desktop/Programs/FileTransfer-er/receiverServer.py
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+
+# NOTE: Copy this file to ~/.config/systemd/user/FileTransfer-er-receiver.service and edit ExecStart
+# then run: systemctl --user daemon-reload && systemctl --user enable --now FileTransfer-er-receiver

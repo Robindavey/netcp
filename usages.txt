@@ -1,0 +1,16 @@
+ln -s ../../update.sh .git/hooks/post-merge
+chmod +x update.sh
+
+journalctl -u recieverServer -f
+
+make install
+make update
+make logs
+
+
+git pull
+make update
+
+make logs
+
+make uninstall
