@@ -96,3 +96,15 @@ git clone https://github.com/yourorg/netcp.git
 cd netcp
 chmod +x setup.sh
 ./setup.sh
+
+
+
+
+serverInstall
+
+curl -fsSL https://raw.githubusercontent.com/YOURORG/netcp/main/install.sh | bash
+
+which netcp
+netcp --help
+systemctl is-active recieverServer
+journalctl -u recieverServer -n 20
