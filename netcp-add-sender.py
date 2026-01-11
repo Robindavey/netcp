@@ -29,4 +29,19 @@ if __name__ == "__main__":
     if os.geteuid() != 0:
         print("This script must be run with sudo")
         sys.exit(1)
-    writeIP(validate_args())
+    ip = validate_args()
+    if not ip:
+        sys.exit(1)
+    writeIP(ip)
+
+    # Try to restart the receiver service so the new IP takes effect immediately
+    try:
+        import subprocess
+        res = subprocess.run(["systemctl", "restart", "recieverServer.service"], check=False, capture_output=True, text=True)
+        if res.returncode == 0:
+            print("recieverServer.service restarted successfully")
+        else:
+            print("Warning: failed to restart recieverServer.service:")
+            print(res.stderr.strip() or res.stdout.strip())
+    except Exception as e:
+        print(f"Warning: could not restart service: {e}")

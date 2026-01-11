@@ -76,7 +76,8 @@ def send_file(local_path, dest, ip="127.0.0.1", port=PORT, absolute=False):
         except Exception:
             body = "(no response body)"
         print(f"Server returned {response.status_code} {response.reason}:\n{body}")
-        raise
+        # Exit gracefully with non-zero code rather than raising a full traceback
+        sys.exit(1)
 
 import sys
     
