@@ -1,6 +1,9 @@
 [Unit]
 Description=NetCP Receiver Server
 After=network.target
+# Prevent systemd from restarting too aggressively
+StartLimitIntervalSec=600
+StartLimitBurst=5
 
 [Service]
 Type=simple
