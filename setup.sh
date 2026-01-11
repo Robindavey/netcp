@@ -36,3 +36,6 @@ systemctl enable "${SERVICE_NAME}"
 systemctl restart "${SERVICE_NAME}"
 
 log "Install complete"
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+
+source ~/.bashrc
