@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 from http.server import HTTPServer, BaseHTTPRequestHandler
+import socketserver
+import socket
 from urllib.parse import urlparse, parse_qs
 import os
 from pathlib import Path
@@ -19,7 +21,16 @@ try:
 except FileNotFoundError:
     allowedIP = []
 # Banned directories for safety
-BANNED_DIRS = {".git", "__pycache__", "venv"}
+BANNED_DIRS = {".git", "__pycache__", "venv", "venv2", ".venv"}
+# Allowed absolute destination prefixes (one per line) can be listed in `allowedPaths`.
+try:
+    with open("allowedPaths", "r") as f:
+        ALLOWED_ABS_PREFIXES = [line.strip() for line in f if line.strip()]
+except FileNotFoundError:
+    ALLOWED_ABS_PREFIXES = []
+
+# Always allow paths under the receiver user's home directory
+HOME_DIR = os.path.expanduser("~")
 def getLocalIP():
     import socket
 
@@ -58,6 +69,24 @@ class FileReceiverHandler(BaseHTTPRequestHandler):
             if is_absolute:
                 # treat provided value as an absolute path (or make absolute)
                 dest_path = os.path.abspath(relative_path)
+                # Allow anything under any user's /home directory (e.g. /home/serv1user/...)
+                if dest_path == "/home" or dest_path.startswith(os.path.join("/home", "")):
+                    allowed = True
+                else:
+                    # If absolute destinations are restricted, require they start with an allowed prefix
+                    if ALLOWED_ABS_PREFIXES:
+                        allowed = any(dest_path.startswith(os.path.abspath(p)) for p in ALLOWED_ABS_PREFIXES)
+                    else:
+                        allowed = False
+
+                    if not allowed:
+                        # Log rejection for diagnosis
+                        print(f"Rejected absolute destination: {dest_path}; allowed_prefixes={ALLOWED_ABS_PREFIXES} home_dir={HOME_DIR}")
+                        self.send_response(403)
+                        self.end_headers()
+                        msg = f"Forbidden path: absolute destination not permitted\nAllowed prefixes: {ALLOWED_ABS_PREFIXES}\nHome directory allowed: {HOME_DIR}\n"
+                        self.wfile.write(msg.encode())
+                        return
             else:
                 # Destination inside DEFAULT_BUCKET
                 dest_path = os.path.abspath(os.path.join(DEFAULT_BUCKET, relative_path))
@@ -117,7 +146,23 @@ class FileReceiverHandler(BaseHTTPRequestHandler):
 # Run server
 # ==========================
 if __name__ == "__main__":
-    server = HTTPServer((HOST, PORT), FileReceiverHandler)
+    # Allow quick restarts by reusing the address if possible
+    socketserver.TCPServer.allow_reuse_address = True
+
+    try:
+        server = HTTPServer((HOST, PORT), FileReceiverHandler)
+    except OSError as e:
+        print(f"Failed to bind {HOST}:{PORT}: {e}")
+        # Try to give hints to the operator
+        try:
+            # show which process is listening (requires ss)
+            import subprocess
+            out = subprocess.check_output(["ss", "-ltnp"]).decode()
+            print("Listening sockets (ss -ltnp):\n", out)
+        except Exception:
+            pass
+        raise
+
     print(f"Server listening on {HOST}:{PORT}")
     try:
         server.serve_forever()
