@@ -13,7 +13,7 @@ PORT = 9101
 # ==========================
 # Configuration
 # ==========================
-COMMAND = 'sudo netcp-add-sender <IP>'  # Change this to your command
+COMMAND = 'sudo netcp-add-sender Sample-IP'  # Change this to your command
 
 # HTML template
 HTML = f"""<!DOCTYPE html>
