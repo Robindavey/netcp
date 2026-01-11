@@ -9,7 +9,8 @@ log "Installing for user: ${USER_NAME}"
 # Create install directory
 # ----------------------------
 mkdir -p "${INSTALL_DIR}"
-cp netcp.py recieverServer.py requirements.txt serve_command.py "${INSTALL_DIR}"
+# copy main scripts including the add-sender helper
+cp netcp.py recieverServer.py requirements.txt serve_command.py netcp-add-sender.py "${INSTALL_DIR}"
 
 # ----------------------------
 # Create virtual environments
@@ -23,10 +24,11 @@ cp netcp.py recieverServer.py requirements.txt serve_command.py "${INSTALL_DIR}"
 # ----------------------------
 # Fix shebangs & permissions
 # ----------------------------
-sed -i "1s|^#!.*|#!${VENV2_DIR}/bin/python|" "${INSTALL_DIR}/netcp.py"
-chmod +x "${INSTALL_DIR}/netcp.py"
-chmod +x "${INSTALL_DIR}/netcp-add-sender.py"
-chmod +x "${INSTALL_DIR}/serve_command.py"
+# Ensure all installed scripts use the venv python shebang and are executable
+for file in netcp.py netcp-add-sender.py serve_command.py; do
+  sed -i "1s|^#!.*|#!${VENV2_DIR}/bin/python|" "${INSTALL_DIR}/$file"
+  chmod +x "${INSTALL_DIR}/$file"
+done
 
 # ----------------------------
 # Symlink scripts to PATH

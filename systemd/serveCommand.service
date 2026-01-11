@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=__USER__                # Will be replaced by installer
-WorkingDirectory=__HOME__/Programs/netcp
-ExecStart=__HOME__/Programs/netcp/serve_command.py
+WorkingDirectory=__HOME__/netcp
+ExecStart=__HOME__/netcp/serve_command.py
 Restart=on-failure
 
 [Install]
