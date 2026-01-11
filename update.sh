@@ -18,6 +18,11 @@ fi
 sed -i "1s|^#!.*|#!${VENV2_DIR}/bin/python|" "${INSTALL_DIR}/netcp.py"
 chmod +x "${INSTALL_DIR}/netcp.py"
 
+sudo systemctl daemon-reload
+# Restart receiver service by name
 sudo systemctl restart "${SERVICE_NAME}"
-sudo systemctl restart "${SERVICE_DST}"
+# Restart the command-page service if present
+if systemctl list-units --full -all | grep -q "serveCommand.service"; then
+	sudo systemctl restart serveCommand.service
+fi
 log "Update complete"
