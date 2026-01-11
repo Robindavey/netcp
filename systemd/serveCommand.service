@@ -6,8 +6,13 @@ After=network.target
 Type=simple
 User=__USER__                # Will be replaced by installer
 WorkingDirectory=__HOME__/netcp
-ExecStart=__HOME__/netcp/serve_command.py
+ExecStart=__HOME__/netcp/venv2/bin/python __HOME__/netcp/serve_command.py
 Restart=on-failure
+RestartSec=3
+
+# Prevent systemd from restarting too aggressively
+StartLimitIntervalSec=600
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target
