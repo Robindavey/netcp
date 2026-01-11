@@ -10,7 +10,14 @@ log "Installing for user: ${USER_NAME}"
 # ----------------------------
 mkdir -p "${INSTALL_DIR}"
 # copy main scripts including the add-sender helper
-cp netcp.py recieverServer.py requirements.txt serve_command.py netcp-add-sender.py "${INSTALL_DIR}"
+# If INSTALL_DIR equals the repo directory, skip copying to avoid
+# "are the same file" errors when running from the repository.
+SRC_DIR="$PWD"
+if [ "$(readlink -f "$SRC_DIR")" = "$(readlink -f "${INSTALL_DIR}")" ]; then
+  log "Install directory is repository; skipping copy step"
+else
+  cp netcp.py recieverServer.py requirements.txt serve_command.py netcp-add-sender.py "${INSTALL_DIR}"
+fi
 
 # ----------------------------
 # Create virtual environments
