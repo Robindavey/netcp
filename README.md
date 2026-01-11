@@ -102,7 +102,7 @@ chmod +x setup.sh
 
 serverInstall
 
-curl -fsSL https://raw.githubusercontent.com/YOURORG/netcp/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Robindavey/netcp/main/install.sh | bash
 
 which netcp
 netcp --help
