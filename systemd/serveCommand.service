@@ -8,7 +8,8 @@ StartLimitBurst=5
 
 [Service]
 Type=simple
-User=__USER__                # Will be replaced by installer
+# User will be replaced by installer
+User=__USER__
 WorkingDirectory=__HOME__/netcp
 ExecStart=__HOME__/netcp/venv2/bin/python __HOME__/netcp/serve_command.py
 Restart=on-failure
