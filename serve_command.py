@@ -3,7 +3,7 @@
 Serve a simple HTML page with a centered copyable command over HTTP.
 Usage:
     python3 serve_command.py [PORT]
-Default PORT is 8000.
+Default PORT is 9101.
 """
 
 import http.server
@@ -13,7 +13,7 @@ PORT = 9101
 # ==========================
 # Configuration
 # ==========================
-COMMAND = 'echo "Hello, world!"'  # Change this to your command
+COMMAND = 'netcp-add-sender <IP>'  # Change this to your command
 
 # HTML template
 HTML = f"""<!DOCTYPE html>
