@@ -18,11 +18,21 @@ fi
 sed -i "1s|^#!.*|#!${VENV2_DIR}/bin/python|" "${INSTALL_DIR}/netcp.py"
 chmod +x "${INSTALL_DIR}/netcp.py"
 
+# Deploy systemd unit files with installer substitutions
+SERVICE_DST="/etc/systemd/system/recieverServer.service"
+SERVICE_PAGE_DST="/etc/systemd/system/serveCommand.service"
+
+log "Installing/updating systemd unit files"
+# Replace placeholders and write unit files as root
+sed -e "s|__USER__|${USER_NAME}|g" -e "s|__HOME__|${HOME_DIR}|g" systemd/recieverServer.service | sudo tee "${SERVICE_DST}" > /dev/null
+sed -e "s|__USER__|${USER_NAME}|g" -e "s|__HOME__|${HOME_DIR}|g" systemd/serveCommand.service | sudo tee "${SERVICE_PAGE_DST}" > /dev/null
+
 sudo systemctl daemon-reload
-# Restart receiver service by name
-sudo systemctl restart "${SERVICE_NAME}"
-# Restart the command-page service if present
-if systemctl list-units --full -all | grep -q "serveCommand.service"; then
-	sudo systemctl restart serveCommand.service
-fi
+
+# Try to enable and restart services, but continue even if restart fails so update completes
+sudo systemctl enable recieverServer.service || true
+sudo systemctl restart recieverServer.service || true
+sudo systemctl enable serveCommand.service || true
+sudo systemctl restart serveCommand.service || true
+
 log "Update complete"
