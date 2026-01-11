@@ -45,3 +45,9 @@ if __name__ == "__main__":
             print(res.stderr.strip() or res.stdout.strip())
     except Exception as e:
         print(f"Warning: could not restart service: {e}")
+    # Clear systemd failure counters so start-limits won't block immediate attempts
+    try:
+        import subprocess
+        subprocess.run(["systemctl", "reset-failed", "recieverServer.service"], check=False)
+    except Exception:
+        pass

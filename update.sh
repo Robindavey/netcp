@@ -23,9 +23,26 @@ SERVICE_DST="/etc/systemd/system/recieverServer.service"
 SERVICE_PAGE_DST="/etc/systemd/system/serveCommand.service"
 
 log "Installing/updating systemd unit files"
-# Replace placeholders and write unit files as root
-sed -e "s|__USER__|${USER_NAME}|g" -e "s|__HOME__|${HOME_DIR}|g" systemd/recieverServer.service | sudo tee "${SERVICE_DST}" > /dev/null
-sed -e "s|__USER__|${USER_NAME}|g" -e "s|__HOME__|${HOME_DIR}|g" systemd/serveCommand.service | sudo tee "${SERVICE_PAGE_DST}" > /dev/null
+
+# Replace placeholders into temp files and validate with systemd-analyze
+TMP_RECIP=$(mktemp /tmp/recieverServer.service.XXXX)
+TMP_SERVE=$(mktemp /tmp/serveCommand.service.XXXX)
+sed -e "s|__USER__|${USER_NAME}|g" -e "s|__HOME__|${HOME_DIR}|g" systemd/recieverServer.service > "${TMP_RECIP}"
+sed -e "s|__USER__|${USER_NAME}|g" -e "s|__HOME__|${HOME_DIR}|g" systemd/serveCommand.service > "${TMP_SERVE}"
+
+# Validate unit files before installing
+if command -v systemd-analyze >/dev/null 2>&1; then
+	if ! systemd-analyze verify "${TMP_RECIP}" 2>/tmp/_srv_err || ! systemd-analyze verify "${TMP_SERVE}" 2>/tmp/_srv_err; then
+		echo "Error: systemd unit validation failed:" >&2
+		sed -n '1,200p' /tmp/_srv_err >&2 || true
+		rm -f "${TMP_RECIP}" "${TMP_SERVE}" /tmp/_srv_err
+		exit 1
+	fi
+fi
+
+# Install validated unit files
+sudo install -m 644 "${TMP_RECIP}" "${SERVICE_DST}"
+sudo install -m 644 "${TMP_SERVE}" "${SERVICE_PAGE_DST}"
 
 sudo systemctl daemon-reload
 
