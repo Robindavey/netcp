@@ -12,7 +12,7 @@ PYTHON_BIN="/usr/bin/python3"
 LOCAL_BIN="${HOME_DIR}/.local/bin"
 SERVICE_NAME="recieverServer.service"
 SERVICE_DST="/etc/systemd/system/${SERVICE_NAME}"
-COMMAND_PAGE = "/etc/systemd/system/""
+COMMAND_PAGE = "/etc/systemd/system/"
 log() {
   echo "[netcp] $1"
 }
